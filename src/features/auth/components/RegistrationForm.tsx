@@ -15,6 +15,7 @@ import {
   validateNameLength,
   validatePasswordLength,
 } from "../../../shared/utils/validation/length";
+import { NewUser } from "../models/NewUser";
 
 const RegistrationForm: FC = () => {
   const {
@@ -49,9 +50,26 @@ const RegistrationForm: FC = () => {
     clearHandler: confirmPasswordClearHandlerconfirm,
   } = useInput(validatePasswordLength);
 
+  const clearForm: any = () => {
+    confirmPasswordClearHandlerconfirm();
+    passwordClearHandler();
+    emailClearHandler();
+    nameClearHandler();
+  };
+
   const onSubmitHandler = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("clicked");
+    if (nameHasError || passwordHasError || emailHasError) return;
+    if (name.length === 0 || email.length === 0 || password.length === 0)
+      return;
+
+    const newUser: NewUser = {
+      name,
+      email,
+      password,
+    };
+
+    clearForm();
   };
 
   return (
@@ -102,7 +120,7 @@ const RegistrationForm: FC = () => {
             onBlur={emailBlurHandler}
             error={emailHasError}
             helperText={emailHasError ? "Please enter a valid email" : ""}
-            type="text"
+            type="email"
             name="email"
             id="email"
             variant="outlined"
@@ -214,6 +232,7 @@ const RegistrationForm: FC = () => {
           </small>
         </div>
       </div>
+      <div></div>
     </Box>
   );
 };

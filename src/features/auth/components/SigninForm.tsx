@@ -9,11 +9,39 @@ import {
 } from "@mui/material";
 import { FC, FormEvent } from "react";
 import { Link } from "react-router-dom";
+import useInput from "../../../hooks/input/useInput";
+import { validateEmail } from "../../../shared/utils/validation/email";
+import { validatePasswordLength } from "../../../shared/utils/validation/length";
 
 const SigninForm: FC = () => {
+  const {
+    text: email,
+    shouldDisplayError: emailHasError,
+    textChangeHandler: emailChangeHandler,
+    inputBlurHandler: emailBlurHandler,
+    clearHandler: emailClearHandler,
+  } = useInput(validateEmail);
+
+  const {
+    text: password,
+    shouldDisplayError: passwordHasError,
+    textChangeHandler: passwordChangeHandler,
+    inputBlurHandler: passwordBlurHandler,
+    clearHandler: passwordClearHandler,
+  } = useInput(validatePasswordLength);
+
+  const clearForm: any = () => {
+    passwordClearHandler();
+    emailClearHandler();
+  };
+
   const onSubmitHandler = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("clicked");
+    if (passwordHasError || emailHasError) return;
+    if (email.length === 0 || password.length === 0) return;
+    const existingUser = { email, password };
+
+    clearForm();
   };
   return (
     <>
@@ -40,6 +68,11 @@ const SigninForm: FC = () => {
               Email{" "}
             </InputLabel>
             <TextField
+              value={email}
+              onChange={emailChangeHandler}
+              onBlur={emailBlurHandler}
+              error={emailHasError}
+              helperText={emailHasError ? "Please enter a valid email" : ""}
               type="email"
               name="email"
               id="email"
@@ -55,6 +88,15 @@ const SigninForm: FC = () => {
               Password{" "}
             </InputLabel>
             <TextField
+              value={password}
+              onChange={passwordChangeHandler}
+              onBlur={passwordBlurHandler}
+              error={passwordHasError}
+              helperText={
+                passwordHasError
+                  ? "Password needs to be at least 6 charcters"
+                  : " "
+              }
               type="password"
               name="password"
               id="password"
