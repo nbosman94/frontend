@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { Navigate } from "react-router-dom";
 import {
   useAppDispatch,
   useAppSelector,
@@ -18,7 +19,7 @@ const PrivateRoute = ({ page }: { page: JSX.Element }) => {
     dispatch(verifyJwt(jwt.token));
   }, [jwt, isSuccess]);
 
-  return <div></div>;
+  return isAuthenticated ? page : <Navigate replace to="/signin" />;
 };
 
 export default PrivateRoute;
