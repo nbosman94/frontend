@@ -6,12 +6,19 @@ import {
   Typography,
   Button,
   Divider,
+  CircularProgress,
 } from "@mui/material";
-import { FC, FormEvent } from "react";
-import { Link } from "react-router-dom";
+import { FC, FormEvent, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import {
+  useAppDispatch,
+  useAppSelector,
+} from "../../../hooks/input/redux/hooks";
 import useInput from "../../../hooks/input/useInput";
 import { validateEmail } from "../../../shared/utils/validation/email";
 import { validatePasswordLength } from "../../../shared/utils/validation/length";
+import { login, reset } from "../authSlice";
+import { LoginUser } from "../models/LoginUser.interface";
 
 const SigninForm: FC = () => {
   const {
@@ -35,14 +42,36 @@ const SigninForm: FC = () => {
     emailClearHandler();
   };
 
+  const dispatch = useAppDispatch();
+  const { isLoading, isAuthenticated, isSuccess } = useAppSelector(
+    (state) => state.auth
+  );
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isSuccess) {
+      dispatch(reset());
+      clearForm();
+    }
+  }, [isSuccess, dispatch]);
+
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    navigate("/");
+  }, [isAuthenticated]);
+
   const onSubmitHandler = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (passwordHasError || emailHasError) return;
     if (email.length === 0 || password.length === 0) return;
-    const existingUser = { email, password };
+    const existingUser: LoginUser = { email, password };
+
+    dispatch(login(existingUser));
 
     clearForm();
   };
+
+  if (isLoading) return <CircularProgress sx={{ marginTop: "64px" }} />;
   return (
     <>
       <Box
