@@ -1,12 +1,16 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
-import { logout } from "../features/auth/authSlice";
+import { logout, selectedUser } from "../features/auth/authSlice";
 import { useAppDispatch, useAppSelector } from "../hooks/input/redux/hooks";
 
 const HomePage = () => {
   const dispatch = useAppDispatch();
-  const { user } = useAppSelector((state) => state.auth);
+  const { user } = useAppSelector(selectedUser);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    console.log(user);
+  }, [user]);
 
   const logoutHandler = () => {
     dispatch(logout());
@@ -28,6 +32,7 @@ const HomePage = () => {
       >
         Logout
       </a>
+      <h2>{user?.email}</h2>
     </div>
   );
 };
